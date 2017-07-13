@@ -6,17 +6,17 @@
 package main
 
 import (
-	// "errors"
-	// "fmt"
-	// holo "github.com/metacurrency/holochain"
-	// "github.com/metacurrency/holochain/ui"
-	// "github.com/urfave/cli"
+	_ "errors"
+	_ "fmt"
+	_ "github.com/metacurrency/holochain"
+	_ "github.com/metacurrency/holochain/ui"
+	_ "github.com/urfave/cli"
 	"os"
-	// "os/user"
- //  exec    "os/exec"
-	// "path"
+	_ "os/user"
+  _    "os/exec"
+	_ "path"
   filepath    "path/filepath"
-	// "time"
+	_ "time"
 )
 
 const (
