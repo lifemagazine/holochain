@@ -1,0 +1,18 @@
+#!/bin/bash
+
+[ ! -f ./bin/holochain.system.checkInstalled ] && { echo "HC: not in a holochain core directory. exitting" && exit 1 ; }
+
+targetDir="$GOPATH/src/github.com/metacurrency/holochain"
+myDir="."
+
+holochain.tools.confirm "this will remove the existing content at $targetDir (y/N)" || { echo "exiting" && exit 1 ; }
+rm -rf $targetDir
+
+cp $myDir $targetDir -r
+
+holochain.tools.confirm "Do you want to compile bs, hc and hcdev? (y/N)" || { echo "HC: exiting" && exit 1 ; }
+cd $targetDir
+make bs
+make hc
+make hcdev
+

@@ -13,6 +13,7 @@ import (
 	"github.com/urfave/cli"
 	"os"
 	"os/user"
+  exec    "os/exec"
 	"path"
 	"time"
 )
@@ -20,6 +21,21 @@ import (
 const (
 	defaultPort = "4141"
 )
+
+import (
+    "fmt"
+    "os"
+    "path/filepath"
+)
+
+func locationOfExecutable() (string, err) {
+    dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+    return
+}
+func locationOfBinScripts() (string, err) {
+    dir, err := filepath.Join(locationOfExecutable, "../../bin")
+    return
+}
 
 var debug bool
 var rootPath, devPath, name string
@@ -122,6 +138,31 @@ func setupApp() (app *cli.App) {
 				ui.NewWebServer(h, port).Start()
 				return err
 			},
+
+      {
+      Name:      "core",
+      Usage:     fmt.Sprintf("commands relating to Holochain Core"),
+      Subcommands: []cli.Command{
+        {
+          Name:       "localSource",
+          // Aliases:    []string{"branch"},
+          Usage:      "Holochain Core commands relating to localSource code",
+          Subcommands: []cli.Command{
+            {
+              Name:       "install",
+              // Aliases:    []string{"branch"},
+              Usage:      "install the version of Holochain Core in '.' onto the host system",
+              Action:     func(c *cli.Context) error {
+                fmt.Println("calling Script")
+                
+
+
+                return nil
+              },
+            },
+          },
+        },
+      },
 		}}
 
 	app.Before = func(c *cli.Context) error {
