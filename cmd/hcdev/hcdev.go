@@ -50,7 +50,7 @@ func syscallExec(binaryFile string, args ...string){
 
 var debug bool
 var rootPath, devPath, name string
-var coreBranchInstallPath string
+var coreBranchInstallPath, appTestScenario string
 
 func setupApp() (app *cli.App) {
   app = cli.NewApp()
@@ -60,51 +60,103 @@ func setupApp() (app *cli.App) {
 
   app.Commands = []cli.Command{
     {
-        Name:      "core",
-        Usage:     fmt.Sprintf("commands relating to Holochain Core"),
-        Subcommands: []cli.Command{
-          {
-            Name:               "branch",
-            // Aliases:    []string{"branch"},
-            Usage:              "install a Holochain Core from a git branch",
-            Flags:              []cli.Flag{
-                cli.StringFlag{
-                 Name:          "sourceDirectory",
-                 Usage:         "path to source files containing checked out git branch, defaults to current directory",
-                 Value:         getCurrentDirectory(),
-                 Destination:   &coreBranchInstallPath,
-                },
-            },
-            Subcommands:    []cli.Command{
-              {
-                Name:           "install",
-                // Aliases:    []string{"branch"},
-                Usage:          "install the version of Holochain Core in '.' onto the host system",
-                Action:         func(c *cli.Context) error {
-                    fmt.Printf  ("HC: core.branch.install: installing from: %v\n",      coreBranchInstallPath)
+      Name:      "core",
+      Usage:     fmt.Sprintf("commands relating to Holochain Core"),
+      Subcommands: []cli.Command{
+        {
+          Name:               "branch",
+          // Aliases:    []string{"branch"},
+          Usage:              "install a Holochain Core from a git branch",
+          Flags:              []cli.Flag{
+              cli.StringFlag{
+                Name:          "sourceDirectory",
+                Usage:         "path to source files containing checked out git branch, defaults to current directory",
+                Value:         getCurrentDirectory(),
+                Destination:   &coreBranchInstallPath,
+              },
+          },
+          Subcommands:    []cli.Command{
+            {
+              Name:           "install",
+              // Aliases:    []string{"branch"},
+              Usage:          "install the version of Holochain Core in '.' onto the host system",
+              Action:         func(c *cli.Context) error {
+                  fmt.Printf  ("HC: core.branch.install: installing from: %v\n",      coreBranchInstallPath)
 
-                    err := os.Chdir(coreBranchInstallPath)
-                    if err != nil {
-                      fmt.Printf("HC: core.branch.install: could not change dir to %v", coreBranchInstallPath)
-                      os.Exit(1)
-                    }
+                  err := os.Chdir(coreBranchInstallPath)
+                  if err != nil {
+                    fmt.Printf("HC: core.branch.install: could not change dir to %v", coreBranchInstallPath)
+                    os.Exit(1)
+                  }
 
-                    // terminates go process
-                    syscallExec(
-                        filepath.Join(
-                          os.Getenv("GOPATH"), 
-                          "src/github.com/metacurrency/holochain", 
-                          "bin", 
-                          "holochain.core.testing.branch",
-                        ),
-                    )
+                  // terminates go process
+                  syscallExec(
+                      filepath.Join(
+                        os.Getenv("GOPATH"), 
+                        "src/github.com/metacurrency/holochain", 
+                        "bin", 
+                        "holochain.core.testing.branch",
+                      ),
+                  )
 
-                    return nil
-                },
+                  return nil
               },
             },
           },
         },
+      },
+    },
+    {
+      Name:      "app",
+      Usage:     fmt.Sprintf("commands relating to Holochain Core"),
+      Subcommands: []cli.Command{
+        {
+          Name:               "init",
+          // Aliases:    []string{"branch"},
+          Usage:              "initialise a directory to be a Holochain App",
+          Action:         func(c *cli.Context) error {
+              // terminates go process
+              syscallExec(
+                  filepath.Join(
+                    os.Getenv("GOPATH"), 
+                    "src/github.com/metacurrency/holochain", 
+                    "bin", 
+                    "holochain.app.init",
+                  ),
+                  appTestScenario,
+              )
+
+              return nil
+          },
+        },
+        {
+          Name:               "testScenario",
+          // Aliases:    []string{"branch"},
+          Usage:              "run a scenario test",
+          Flags:              []cli.Flag{
+              cli.StringFlag{
+                Name:          "scenario",
+                Usage:         "the name of the directory containing the scenario",
+                Value:         "",
+                Destination:   &appTestScenario,
+              },
+          },
+          Action:         func(c *cli.Context) error {
+              // terminates go process
+              syscallExec(
+                  filepath.Join(
+                    os.Getenv("GOPATH"), 
+                    "src/github.com/metacurrency/holochain", 
+                    "bin", 
+                    "holochain.app.testScenario",
+                  ),
+                  appTestScenario,
+              )
+
+              return nil
+          },
+        },
+      },
     },
   }
 
@@ -291,6 +343,8 @@ func setupApp() (app *cli.App) {
 
 func main() {
   app := setupApp()
+
+  app.EnableBashCompletion = true
 
   err := app.Run(os.Args)
   if err != nil {
